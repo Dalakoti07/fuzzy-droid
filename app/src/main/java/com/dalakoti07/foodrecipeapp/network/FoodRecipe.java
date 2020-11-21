@@ -31,4 +31,32 @@ public class FoodRecipe {
                 ", description='" + description + '\'' +
                 '}';
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }
