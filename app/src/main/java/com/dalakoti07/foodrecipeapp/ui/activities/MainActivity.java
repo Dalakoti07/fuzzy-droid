@@ -5,12 +5,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.dalakoti07.foodrecipeapp.FoodApplication;
 import com.dalakoti07.foodrecipeapp.R;
 import com.dalakoti07.foodrecipeapp.network.FoodRecipe;
 import com.dalakoti07.foodrecipeapp.network.NetworkHelper;
@@ -47,6 +49,12 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
         cartItemCounter= new CartItemCounter(findViewById(R.id.cart_menu_option));
         makeApiCall();
         setUpTinderSwipeListener();
+        findViewById(R.id.cart_menu_option).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context,CartActivity.class));
+            }
+        });
     }
 
     private void setUpTinderSwipeListener() {
@@ -98,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
     @Override
     public void addToCart(FoodRecipe foodRecipe) {
         //add check, add to foodApplication's arrayList
+        ((FoodApplication)context).addItemsToCart(foodRecipe);
         cartItemCounter.increaseCount();
     }
 }
