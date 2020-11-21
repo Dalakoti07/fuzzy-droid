@@ -20,6 +20,13 @@ import com.mindorks.placeholderview.annotations.swipe.SwipeOutState;
 
 @Layout(R.layout.food_card_view)
 public class TinderCard {
+    private addToCartListener listener;
+
+    // add Item to cart listener
+    public interface addToCartListener{
+        void addToCart(FoodRecipe foodRecipe);
+    }
+
     private static final String TAG = "TinderCardTag";
 
     @View(R.id.iv_food_image)
@@ -38,15 +45,16 @@ public class TinderCard {
     private Context mContext;
     private SwipePlaceHolderView mSwipeView;
 
-    public TinderCard(Context context, FoodRecipe profile, SwipePlaceHolderView swipeView) {
+    public TinderCard(Context context, FoodRecipe profile, SwipePlaceHolderView swipeView,addToCartListener listener) {
         mContext = context;
         foodRecipe = profile;
         mSwipeView = swipeView;
+        this.listener=listener;
     }
 
     @Resolve
     private void onResolved(){
-        Glide.with(mContext).load(foodRecipe.getImage()).into(foodImageView);
+        Glide.with(mContext).load(foodRecipe.getImage()).centerCrop().into(foodImageView);
         tv_food_name.setText(foodRecipe.getName());
         tv_food_category.setText(foodRecipe.getCategory());
         tv_food_price.setText(foodRecipe.getPrice());
@@ -66,6 +74,7 @@ public class TinderCard {
     @SwipeIn
     private void onSwipeIn(){
         Log.d(TAG, "onSwipedIn");
+        listener.addToCart(this.foodRecipe);
     }
 
     @SwipeInState
