@@ -20,6 +20,40 @@ public class FoodDatabaseModel {
 
     private String description;
 
+    private Boolean isFavourite;
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setFavourite(Boolean favourite) {
+        isFavourite = favourite;
+    }
+
     @Override
     public String toString() {
         return "FoodRecipe{" +
@@ -64,5 +98,9 @@ public class FoodDatabaseModel {
 
     public String getDescription() {
         return description;
+    }
+
+    public Boolean getFavourite() {
+        return isFavourite;
     }
 }

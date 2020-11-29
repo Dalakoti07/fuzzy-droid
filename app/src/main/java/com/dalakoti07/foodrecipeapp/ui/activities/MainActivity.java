@@ -17,6 +17,7 @@ import com.dalakoti07.foodrecipeapp.FoodApplication;
 import com.dalakoti07.foodrecipeapp.R;
 import com.dalakoti07.foodrecipeapp.network.FoodRecipe;
 import com.dalakoti07.foodrecipeapp.ui.viewmodels.MainActivityViewModel;
+import com.dalakoti07.foodrecipeapp.ui.viewmodels.MainViewModelFactory;
 import com.dalakoti07.foodrecipeapp.utils.CartItemCounter;
 import com.dalakoti07.foodrecipeapp.utils.TinderCard;
 import com.mindorks.placeholderview.SwipeDecor;
@@ -24,6 +25,8 @@ import com.mindorks.placeholderview.SwipePlaceHolderView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 
 // todo add disk cache
@@ -45,51 +48,38 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
         context = getApplicationContext();
         progressBar= findViewById(R.id.progress_bar);
         cartItemCounter= new CartItemCounter(findViewById(R.id.cart_menu_option));
-        mainActivityViewModel= new ViewModelProvider(this).get(MainActivityViewModel.class);
+        mainActivityViewModel= new ViewModelProvider(this, new MainViewModelFactory(getApplication())).get(MainActivityViewModel.class);
         makeApiCallAndAddObserver();
         setUpTinderSwipeListener();
-        findViewById(R.id.cart_menu_option).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(context,CartActivity.class));
-            }
-        });
+        findViewById(R.id.cart_menu_option).setOnClickListener(view -> startActivity(new Intent(context,CartActivity.class)));
     }
 
     private void setUpTinderSwipeListener() {
-        mainActivityViewModel.isDataFetchedFromServer().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean currentState) {
-                if(currentState){
-                    swipePlaceHolderView.getBuilder()
-                            .setDisplayViewCount(3)
-                            .setSwipeDecor(new SwipeDecor()
-                                    .setPaddingTop(20)
-                                    .setRelativeScale(0.01f)
-                                    .setSwipeInMsgLayoutId(R.layout.food_swipe_in_msg_view)
-                                    .setSwipeOutMsgLayoutId(R.layout.food_swipe_out_msg_view));
+        mainActivityViewModel.returnNetworkStatus().observe(this, currentState -> {
+            if(currentState.equals("Success")){
+                swipePlaceHolderView.getBuilder()
+                        .setDisplayViewCount(3)
+                        .setSwipeDecor(new SwipeDecor()
+                                .setPaddingTop(20)
+                                .setRelativeScale(0.01f)
+                                .setSwipeInMsgLayoutId(R.layout.food_swipe_in_msg_view)
+                                .setSwipeOutMsgLayoutId(R.layout.food_swipe_out_msg_view));
 
-                    for(FoodRecipe food : foodRecipesList){
-                        swipePlaceHolderView.addView(new TinderCard(context, food, swipePlaceHolderView,MainActivity.this));
-                    }
-                    progressBar.setVisibility(View.INVISIBLE);
-                }else{
-                    Toast.makeText(context, "Error: "+MainActivityViewModel.errorMessage, Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.INVISIBLE);
+                for(FoodRecipe food : foodRecipesList){
+                    swipePlaceHolderView.addView(new TinderCard(context, food, swipePlaceHolderView,MainActivity.this));
                 }
+                progressBar.setVisibility(View.INVISIBLE);
+            }else{
+                Toasty.error(context, " "+currentState, Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
 
     private void makeApiCallAndAddObserver() {
-        mainActivityViewModel.fetchTheDataFromRepository().observe(this, new Observer<List<FoodRecipe>>() {
-            @Override
-            public void onChanged(List<FoodRecipe> foodRecipes) {
-                if(foodRecipes!=null)
-                    foodRecipesList.addAll(foodRecipes);
-                else
-                    Toast.makeText(context, "Error: "+MainActivityViewModel.errorMessage, Toast.LENGTH_SHORT).show();
-            }
+        mainActivityViewModel.fetchTheDataFromRepository().observe(this, foodRecipes -> {
+            if(foodRecipes!=null)
+                foodRecipesList.addAll(foodRecipes);
         });
     }
 
