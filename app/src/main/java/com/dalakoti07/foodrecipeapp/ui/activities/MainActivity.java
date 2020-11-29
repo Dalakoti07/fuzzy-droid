@@ -16,9 +16,11 @@ import android.widget.Toast;
 import com.dalakoti07.foodrecipeapp.FoodApplication;
 import com.dalakoti07.foodrecipeapp.R;
 import com.dalakoti07.foodrecipeapp.network.FoodRecipe;
+import com.dalakoti07.foodrecipeapp.room.FoodDatabaseModel;
 import com.dalakoti07.foodrecipeapp.ui.viewmodels.MainActivityViewModel;
 import com.dalakoti07.foodrecipeapp.ui.viewmodels.MainViewModelFactory;
 import com.dalakoti07.foodrecipeapp.utils.CartItemCounter;
+import com.dalakoti07.foodrecipeapp.utils.DataTransformer;
 import com.dalakoti07.foodrecipeapp.utils.TinderCard;
 import com.mindorks.placeholderview.SwipeDecor;
 import com.mindorks.placeholderview.SwipePlaceHolderView;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
     private void makeApiCallAndAddObserver() {
         mainActivityViewModel.fetchTheDataFromRepository().observe(this, foodRecipes -> {
             if(foodRecipes!=null)
-                foodRecipesList.addAll(foodRecipes);
+                foodRecipesList.addAll(DataTransformer.databaseListToNetworkList((ArrayList<FoodDatabaseModel>) foodRecipes) );
         });
     }
 

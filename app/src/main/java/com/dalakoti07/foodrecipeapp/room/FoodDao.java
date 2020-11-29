@@ -8,13 +8,19 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Maybe;
 
 @Dao
 public interface FoodDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<FoodDatabaseModel> foods);
+    void insert(FoodDatabaseModel foods);
+
+/*    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(ArrayList<FoodDatabaseModel> foods);*/
 
     @Query("SELECT * from Food_Table")
     LiveData<List<FoodDatabaseModel>> getAllFoods();

@@ -22,6 +22,7 @@ public class NetworkHelper {
     public synchronized static Apis getApiClient(){
         if(apiClient==null){
             if(retrofitInstance==null){
+                //https://medium.com/programming-lite/retrofit-2-handling-network-error-defc7d373ad1
                 OkHttpClient.Builder oktHttpClient = new OkHttpClient.Builder()
                         .addInterceptor(new NetworkConnectionInterceptor(FoodApplication.getAppContext()));
                 // Adding NetworkConnectionInterceptor with okHttpClientBuilder.
