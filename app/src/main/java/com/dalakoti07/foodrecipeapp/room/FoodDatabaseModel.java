@@ -1,31 +1,23 @@
-package com.dalakoti07.foodrecipeapp.network;
+package com.dalakoti07.foodrecipeapp.room;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.google.gson.annotations.SerializedName;
-
-public class FoodRecipe {
-    @SerializedName("id")
+@Entity(tableName = "Food_Table")
+public class FoodDatabaseModel {
+    @PrimaryKey
     private int id;
 
-    @SerializedName("name")
     private String name;
 
-    @SerializedName("image")
     private String image;
 
-    @SerializedName("category")
     private String category;
 
-    @SerializedName("label")
     private String label;
 
-    @SerializedName("price")
     private String price;
 
-    @SerializedName("description")
     private String description;
 
     @Override
@@ -34,6 +26,16 @@ public class FoodRecipe {
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 '}';
+    }
+
+    public FoodDatabaseModel(int id, String name, String image, String category, String label, String price, String description) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.category = category;
+        this.label = label;
+        this.price = price;
+        this.description = description;
     }
 
     public int getId() {
@@ -62,15 +64,5 @@ public class FoodRecipe {
 
     public String getDescription() {
         return description;
-    }
-
-    public FoodRecipe(int id, String name, String image, String category, String label, String price, String description) {
-        this.id = id;
-        this.name = name;
-        this.image = image;
-        this.category = category;
-        this.label = label;
-        this.price = price;
-        this.description = description;
     }
 }

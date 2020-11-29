@@ -3,6 +3,7 @@ package com.dalakoti07.foodrecipeapp.ui.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,28 +16,25 @@ import android.widget.Toast;
 import com.dalakoti07.foodrecipeapp.FoodApplication;
 import com.dalakoti07.foodrecipeapp.R;
 import com.dalakoti07.foodrecipeapp.network.FoodRecipe;
-import com.dalakoti07.foodrecipeapp.network.NetworkHelper;
+import com.dalakoti07.foodrecipeapp.ui.viewmodels.MainActivityViewModel;
 import com.dalakoti07.foodrecipeapp.utils.CartItemCounter;
 import com.dalakoti07.foodrecipeapp.utils.TinderCard;
 import com.mindorks.placeholderview.SwipeDecor;
 import com.mindorks.placeholderview.SwipePlaceHolderView;
-import com.mindorks.placeholderview.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
+// todo add disk cache
 public class MainActivity extends AppCompatActivity implements TinderCard.addToCartListener{
     private static final String TAG = "MainActivity";
     private ArrayList<FoodRecipe> foodRecipesList= new ArrayList<>();
     private ProgressBar progressBar;
     private SwipePlaceHolderView swipePlaceHolderView;
     private Context context;
-    private MutableLiveData<Boolean> fetchedTheDataFromServer= new MutableLiveData<>();
     private CartItemCounter cartItemCounter;
+    private MainActivityViewModel mainActivityViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +45,8 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
         context = getApplicationContext();
         progressBar= findViewById(R.id.progress_bar);
         cartItemCounter= new CartItemCounter(findViewById(R.id.cart_menu_option));
-        makeApiCall();
+        mainActivityViewModel= new ViewModelProvider(this).get(MainActivityViewModel.class);
+        makeApiCallAndAddObserver();
         setUpTinderSwipeListener();
         findViewById(R.id.cart_menu_option).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
     }
 
     private void setUpTinderSwipeListener() {
-        fetchedTheDataFromServer.observe(this, new Observer<Boolean>() {
+        mainActivityViewModel.isDataFetchedFromServer().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean currentState) {
                 if(currentState){
@@ -73,31 +72,23 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
                     for(FoodRecipe food : foodRecipesList){
                         swipePlaceHolderView.addView(new TinderCard(context, food, swipePlaceHolderView,MainActivity.this));
                     }
+                    progressBar.setVisibility(View.INVISIBLE);
+                }else{
+                    Toast.makeText(context, "Error: "+MainActivityViewModel.errorMessage, Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
             }
         });
     }
 
-    // todo put it in viewmodel
-    private void makeApiCall() {
-        final Call<List<FoodRecipe>> foodRecipeCall =NetworkHelper.getApiClient().getRecipe();
-        foodRecipeCall.enqueue(new Callback<List<FoodRecipe>>() {
+    private void makeApiCallAndAddObserver() {
+        mainActivityViewModel.fetchTheDataFromRepository().observe(this, new Observer<List<FoodRecipe>>() {
             @Override
-            public void onResponse(Call<List<FoodRecipe>> call, Response<List<FoodRecipe>> response) {
-                if(response.isSuccessful()){
-                    //Toast.makeText(MainActivity.this,"Fetched",Toast.LENGTH_SHORT).show();
-                    if(response.body()!=null){
-                        foodRecipesList.addAll(response.body());
-                        Log.d(TAG, "onResponse success: "+foodRecipesList.get(0));
-                        fetchedTheDataFromServer.setValue(true);
-                    }
-                    progressBar.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<FoodRecipe>> call, Throwable t) {
-                Log.d(TAG, "onFailure: "+t.getLocalizedMessage());
+            public void onChanged(List<FoodRecipe> foodRecipes) {
+                if(foodRecipes!=null)
+                    foodRecipesList.addAll(foodRecipes);
+                else
+                    Toast.makeText(context, "Error: "+MainActivityViewModel.errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }

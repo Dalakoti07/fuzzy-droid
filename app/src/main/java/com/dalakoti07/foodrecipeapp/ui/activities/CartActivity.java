@@ -11,6 +11,7 @@ import com.dalakoti07.foodrecipeapp.network.FoodRecipe;
 
 import java.util.ArrayList;
 
+// todo add sqlite support
 public class CartActivity extends AppCompatActivity {
     private RecyclerView rv_foods;
     private ArrayList<FoodRecipe> foodsList= new ArrayList<>();

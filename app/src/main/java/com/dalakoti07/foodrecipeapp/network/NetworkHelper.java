@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkHelper {
     private static String baseUrl= "https://s3-ap-southeast-1.amazonaws.com/he-public-data/";
-    private static Retrofit retrofitInstance;
+    private static volatile Retrofit retrofitInstance;
     private static Apis apiClient;
 
     private NetworkHelper(){
