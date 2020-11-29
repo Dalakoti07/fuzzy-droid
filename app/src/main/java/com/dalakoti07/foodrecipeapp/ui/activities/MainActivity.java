@@ -30,8 +30,7 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
-
-// todo add disk cache
+//todo why data is coming and toast is coming too late, is it cache ?
 public class MainActivity extends AppCompatActivity implements TinderCard.addToCartListener{
     private static final String TAG = "MainActivity";
     private ArrayList<FoodRecipe> foodRecipesList= new ArrayList<>();
@@ -52,11 +51,11 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
         cartItemCounter= new CartItemCounter(findViewById(R.id.cart_menu_option));
         mainActivityViewModel= new ViewModelProvider(this, new MainViewModelFactory(getApplication())).get(MainActivityViewModel.class);
         makeApiCallAndAddObserver();
-        setUpTinderSwipeListener();
+        setupNetworkStateListener();
         findViewById(R.id.cart_menu_option).setOnClickListener(view -> startActivity(new Intent(context,CartActivity.class)));
     }
 
-    private void setUpTinderSwipeListener() {
+    private void setupNetworkStateListener() {
         mainActivityViewModel.returnNetworkStatus().observe(this, currentState -> {
             if(currentState.equals("Success") ){
                 Toasty.success(context,"Got the data from server").show();
@@ -65,11 +64,12 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
             }
             else{
                 Toasty.error(context, " "+currentState, Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.INVISIBLE);
             }
+            progressBar.setVisibility(View.INVISIBLE);
         });
     }
 
+    // todo this callback is called 4 times when calling rest api
     private void makeApiCallAndAddObserver() {
         mainActivityViewModel.fetchTheDataFromRepository().observe(this, foodRecipes -> {
             Log.d(TAG, "makeApiCallAndAddObserver: list has changed");
@@ -100,7 +100,10 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
     @Override
     public void addToCart(FoodRecipe foodRecipe) {
         //add check, add to foodApplication's arrayList
-        ((FoodApplication)context).addItemsToCart(foodRecipe);
+        mainActivityViewModel.addFoodToFavourites(new FoodDatabaseModel(foodRecipe.getId(),
+                foodRecipe.getName(),foodRecipe.getImage(),foodRecipe.getCategory(),foodRecipe.getLabel()
+                ,foodRecipe.getPrice(),foodRecipe.getDescription()));
+        //((FoodApplication)context).addItemsToCart(foodRecipe);
         cartItemCounter.increaseCount();
     }
 }

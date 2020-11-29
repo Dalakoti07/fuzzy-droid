@@ -17,13 +17,13 @@ public class FoodApplication extends Application {
         context=this;
     }
 
-    public void addItemsToCart(FoodRecipe foodRecipe){
+    /*public void addItemsToCart(FoodRecipe foodRecipe){
         cartFoodItems.add(foodRecipe);
     }
 
     public ArrayList<FoodRecipe> getAllCartItems(){
         return cartFoodItems;
-    }
+    }*/
 
     public static Context getAppContext(){
         return context;

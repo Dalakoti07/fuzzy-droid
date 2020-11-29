@@ -27,6 +27,7 @@ public class FoodRepository {
     private static FoodRepository foodRepositoryInstance;
     private MutableLiveData<String> networkErrorString= new MutableLiveData<>();
     LiveData<List<FoodDatabaseModel>> foodList= new MutableLiveData<>();
+    LiveData<List<FoodDatabaseModel>> favFoods= new MutableLiveData<>();
 
     private FoodRepository(RecipeDatabase recipeDatabase){
         Log.d(TAG, "FoodRepository: created a repository instance");
@@ -45,7 +46,6 @@ public class FoodRepository {
     }
 
     public LiveData<List<FoodDatabaseModel>> fetchTheDataFromServer(){
-        //todo fix this expose livedata not mutable live data
         foodList= recipeDatabase.foodDao().getAllFoods();
         final Call<List<FoodRecipe>> foodRecipeCall = NetworkHelper.getApiClient().getRecipe();
         foodRecipeCall.enqueue(new Callback<List<FoodRecipe>>() {
@@ -55,12 +55,12 @@ public class FoodRepository {
                     if(response.body()!=null){
                         // doing database write in background thread
                         recipeDatabase.databaseWriteExecutor.execute(()->{
+                            networkErrorString.postValue("Success");
                             ArrayList<FoodDatabaseModel> databaseModelArrayList= DataTransformer.modelListToDatabaseModelList((ArrayList<FoodRecipe>) response.body());
                             for(FoodDatabaseModel foodDatabaseModel:databaseModelArrayList){
                                 recipeDatabase.foodDao().insert(foodDatabaseModel);
                             }
                             Log.d(TAG, "fetchTheDataFromRepository: fetched via api call and saved "+" instances ");
-                            networkErrorString.postValue("Success");
                         });
                     }
                 }else{
@@ -84,5 +84,25 @@ public class FoodRepository {
             }
         });
         return foodList;
+    }
+
+    public void addFoodToFavourites(FoodDatabaseModel food){
+        food.setFavourite(true);
+        recipeDatabase.databaseWriteExecutor.execute(()->{
+            recipeDatabase.foodDao().addFoodToFavourite(food);
+            Log.d(TAG, "addFoodToFavourites: done");
+        });
+    }
+
+    public LiveData<List<FoodDatabaseModel>> getFavouriteFoods(){
+        recipeDatabase.databaseWriteExecutor.execute(()->{
+            favFoods=recipeDatabase.foodDao().getFavouriteFoods();
+            //DataTransformer.databaseListToNetworkList((ArrayList<FoodDatabaseModel>) recipeDatabase.foodDao().getFavouriteFoods())  ;
+        });
+        return favFoods;
+    }
+
+    public void removeAFoodFromFav(){
+
     }
 }

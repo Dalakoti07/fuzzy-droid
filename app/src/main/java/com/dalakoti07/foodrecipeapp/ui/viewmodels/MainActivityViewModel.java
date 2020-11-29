@@ -34,4 +34,8 @@ public class MainActivityViewModel extends AndroidViewModel {
             return foodList;
         return foodRepository.fetchTheDataFromServer();
     }
+
+    public void addFoodToFavourites(FoodDatabaseModel food){
+        foodRepository.addFoodToFavourites(food);
+    }
 }

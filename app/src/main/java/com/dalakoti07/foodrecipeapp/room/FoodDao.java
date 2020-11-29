@@ -33,5 +33,5 @@ public interface FoodDao {
     void addFoodToFavourite(FoodDatabaseModel foodDatabaseModel);
 
     @Update
-    void removeAllFoodsFromFav(FoodDatabaseModel... foods);
+    void removeAFoodsFromFav(FoodDatabaseModel food);
 }
