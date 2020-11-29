@@ -1,9 +1,5 @@
 package com.dalakoti07.foodrecipeapp.network;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
 import com.google.gson.annotations.SerializedName;
 
 public class FoodRecipe {

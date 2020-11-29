@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase;
 
 import com.dalakoti07.foodrecipeapp.network.FoodRecipe;
 import com.dalakoti07.foodrecipeapp.network.NetworkHelper;
+import com.dalakoti07.foodrecipeapp.network.NoConnectivityException;
 import com.dalakoti07.foodrecipeapp.room.RecipeDatabase;
 
 import java.util.List;
@@ -56,9 +57,14 @@ public class FoodRepository {
 
             @Override
             public void onFailure(Call<List<FoodRecipe>> call, Throwable t) {
-                Log.d(TAG, "onFailure: "+t.getLocalizedMessage());
-                //errorMessage=t.getMessage();
-                networkErrorString.setValue(""+t.getLocalizedMessage());
+                if(t instanceof NoConnectivityException) {
+                    //cache the data from local db
+                    networkErrorString.setValue("No Connectivity");
+                }else{
+                    Log.d(TAG, "onFailure: "+t.getLocalizedMessage());
+                    //errorMessage=t.getMessage();
+                    networkErrorString.setValue(""+t.getLocalizedMessage());
+                }
             }
         });
         return foodList;
