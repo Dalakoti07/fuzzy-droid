@@ -65,4 +65,5 @@ dependencies {
     // optional - RxJava support for Room
     implementation "androidx.room:room-rxjava2:$room_version"
 
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 }

@@ -72,11 +72,11 @@ public class FoodRepository {
             public void onFailure(Call<List<FoodRecipe>> call, Throwable t) {
                 if(t instanceof NoConnectivityException) {
                     //cache the data from local db
-                    networkErrorString.setValue("No Connectivity");
+                    networkErrorString.setValue("Caching From Database");
                     foodList=recipeDatabase.foodDao().getAllFoods();
-                    Log.d(TAG, "no internet connectivity status list: "+foodList+ " value"+foodList.getValue());
-                    if(foodList.getValue()!=null && foodList.getValue().size()>0)
-                        Log.d(TAG, "no internet connectivity "+foodList.getValue().get(0));
+                    Log.d(TAG, "no internet connectivity status list: "+foodList+ " value: "+foodList.getValue());
+                    /*if(foodList.getValue()!=null && foodList.getValue().size()>0)
+                        Log.d(TAG, "no internet connectivity "+foodList.getValue().get(0));*/
                 }else{
                     Log.d(TAG, "onFailure: "+t.getLocalizedMessage());
                     networkErrorString.setValue(""+t.getLocalizedMessage());

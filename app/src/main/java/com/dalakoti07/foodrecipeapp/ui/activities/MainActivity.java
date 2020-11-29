@@ -58,7 +58,26 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
 
     private void setUpTinderSwipeListener() {
         mainActivityViewModel.returnNetworkStatus().observe(this, currentState -> {
-            if(currentState.equals("Success")){
+            if(currentState.equals("Success") ){
+                Toasty.success(context,"Got the data from server").show();
+            }else if(currentState.contains("Caching")){
+                Toasty.info(context,"Cached from Database").show();
+            }
+            else{
+                Toasty.error(context, " "+currentState, Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    private void makeApiCallAndAddObserver() {
+        mainActivityViewModel.fetchTheDataFromRepository().observe(this, foodRecipes -> {
+            Log.d(TAG, "makeApiCallAndAddObserver: list has changed");
+            if(foodRecipes!=null){
+                foodRecipesList.clear();
+                foodRecipesList.addAll(DataTransformer.databaseListToNetworkList((ArrayList<FoodDatabaseModel>) foodRecipes) );
+                Log.d(TAG, "list updated size : "+foodRecipesList.size());
+
                 swipePlaceHolderView.getBuilder()
                         .setDisplayViewCount(3)
                         .setSwipeDecor(new SwipeDecor()
@@ -71,17 +90,9 @@ public class MainActivity extends AppCompatActivity implements TinderCard.addToC
                     swipePlaceHolderView.addView(new TinderCard(context, food, swipePlaceHolderView,MainActivity.this));
                 }
                 progressBar.setVisibility(View.INVISIBLE);
-            }else{
-                Toasty.error(context, " "+currentState, Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.INVISIBLE);
             }
-        });
-    }
-
-    private void makeApiCallAndAddObserver() {
-        mainActivityViewModel.fetchTheDataFromRepository().observe(this, foodRecipes -> {
-            if(foodRecipes!=null)
-                foodRecipesList.addAll(DataTransformer.databaseListToNetworkList((ArrayList<FoodDatabaseModel>) foodRecipes) );
+            else
+                Log.d(TAG, "main activity: got null list");
         });
     }
 

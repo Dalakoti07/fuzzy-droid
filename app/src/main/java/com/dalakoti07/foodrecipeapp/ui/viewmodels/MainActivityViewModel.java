@@ -32,7 +32,6 @@ public class MainActivityViewModel extends AndroidViewModel {
     public LiveData<List<FoodDatabaseModel>> fetchTheDataFromRepository(){
         if(networkResponse.getValue()!=null && networkResponse.getValue().equals("Success"))
             return foodList;
-        Log.d(TAG, "fetchTheDataFromRepository: making a api call");
         return foodRepository.fetchTheDataFromServer();
     }
 }
